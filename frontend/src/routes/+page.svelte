@@ -1,5 +1,4 @@
 <script>
-  import { enhance } from '$app/forms';
   let { data } = $props();
 </script>
 
@@ -27,19 +26,6 @@
     </div>
   {/if}
 {:else}
-  {#if data.captures.length}
-    <h2>Captures to file</h2>
-    {#each data.captures as c (c.slug)}
-      <div class="capture-row">
-        <span>{c.title}</span>
-        <form method="POST" action="?/file" use:enhance>
-          <input type="hidden" name="slug" value={c.slug} />
-          <button class="btn sm" type="submit">File to knowledge</button>
-        </form>
-      </div>
-    {/each}
-  {/if}
-
   <h2>Recent</h2>
   {#if data.recent.length === 0}
     <div class="empty">No notes yet. Capture one from the terminal to see it here.</div>

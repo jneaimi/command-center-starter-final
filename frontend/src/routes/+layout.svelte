@@ -21,7 +21,7 @@
     </nav>
   </aside>
 
-  <main>
+  <main class:wide={$page.url.pathname.includes('/plan/')}>
     {@render children()}
   </main>
 </div>

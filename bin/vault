@@ -5,7 +5,7 @@
 # slices a plan, a TASK attaches to a scope or a plan. An ADR records a
 # decision, off to the side of that spine.
 # Reads (recent, search, tree) run free — looking was never the risk.
-cd ~/vault || { echo "vault: no vault at ~/vault" >&2; exit 2; }
+cd "${VAULT_DIR:-$HOME/vault}" || { echo "vault: no vault at ${VAULT_DIR:-$HOME/vault}" >&2; exit 2; }
 verb="$1"; shift
 
 refuse() { echo "vault: $1" >&2; exit 2; }
@@ -148,13 +148,28 @@ case "$verb" in
       echo "planned: $file (status: planned), linked from the index."
     fi ;;
 
-  done)  # vault done <project> <wi-slug>
+  claim)  # vault claim <project> <task-slug> — the AI picks up work (planning -> active)
     proj="$1"; slug="$2"
-    case "$slug" in wi-*) ;; *) refuse "done only closes work items (wi-…): $slug" ;; esac
+    case "$slug" in wi-*|task-*) ;; *) refuse "claim takes a task (wi-… / task-…): $slug" ;; esac
     file="projects/$proj/$slug.md"
-    [ -e "$file" ] || refuse "no such work item: $file"
-    tmp=$(mktemp); sed 's/^status: .*/status: done/' "$file" > "$tmp" && mv "$tmp" "$file"
-    echo "done: $file" ;;
+    [ -e "$file" ] || refuse "no such task: $file"
+    st=$(meta "$file" status)
+    [ "$st" = "planned" ] || refuse "only a planned task can be claimed (this one is: $st). A human commits its scope first."
+    tmp=$(mktemp); sed 's/^status: .*/status: active/' "$file" > "$tmp" && mv "$tmp" "$file"
+    echo "active: $file — you own it now. When it's done: vault submit $proj $slug" ;;
+
+  submit)  # vault submit <project> <task-slug> — hand it to the Human Gate (active -> review)
+    proj="$1"; slug="$2"
+    case "$slug" in wi-*|task-*) ;; *) refuse "submit takes a task (wi-… / task-…): $slug" ;; esac
+    file="projects/$proj/$slug.md"
+    [ -e "$file" ] || refuse "no such task: $file"
+    st=$(meta "$file" status)
+    [ "$st" = "active" ] || refuse "only an active task can be submitted (this one is: $st)."
+    tmp=$(mktemp); sed 's/^status: .*/status: review/' "$file" > "$tmp" && mv "$tmp" "$file"
+    echo "review: $file — waiting for the Human Gate. You cannot complete it yourself." ;;
+
+  done|complete)  # blocked — the Hook: completing work is the human's call, not the terminal's
+    refuse "completing work is the Human Gate's call, not the terminal's. Move it to review (vault submit <project> <task>) and let the human approve it on the board." ;;
 
   recent)  # vault recent [n] — the newest notes, by created date (read only)
     n="${1:-10}"
@@ -242,9 +257,13 @@ case "$verb" in
     echo "    vault plan    <project> \"the outcome\" [--goal \"one line\"]"
     echo "    vault scope   <project> <plan-slug> \"the slice\""
     echo "    vault task    <project> \"the work item\" [--scope <scope-slug> | --plan <plan-slug>]"
-    echo "    vault done    <project> <wi-slug>"
+    echo "  the work flow (the AI moves its own cards; it can NEVER complete one):"
+    echo "    vault claim   <project> <task-slug>   pick up a planned task  (planning -> active)"
+    echo "    vault submit  <project> <task-slug>   hand it to the gate     (active  -> review)"
     echo "    vault accept  <slug>          the Human Gate: route a proposal into knowledge/"
     echo "    vault reject  <slug>          the Human Gate: log a no"
+    echo "  the Human Gate finishes work on the board (review -> completed). Not here:"
+    echo "    vault done / complete         BLOCKED — approve it on the board instead"
     echo "  reads (run free):"
     echo "    vault recent [n]              the newest notes"
     echo "    vault search <words>          find notes by title or body"

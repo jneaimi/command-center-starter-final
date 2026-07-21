@@ -1,16 +1,18 @@
 #!/usr/bin/env bash
-# install.sh — set up the Week-4 starter vault on this machine.
+# install.sh — set up the finished command center on this machine.
 #
-#   git clone https://github.com/jneaimi/command-center-starter-week4.git
-#   bash command-center-starter-week4/install.sh
+#   git clone https://github.com/jneaimi/command-center-starter-final.git
+#   bash command-center-starter-final/install.sh
 #
 # What it does, in order (nothing is ever deleted — only archived):
 #   1. Places the vault at ~/vault (archives any vault already there).
 #   2. Stages the ~/.claude side: global rules, the guard + settings, my-vault
 #      skill (archives anything it replaces).
 #   3. Makes the tools executable and puts ~/vault/bin on your PATH.
-#   4. Restores ~/todo-app/todo.html if you don't have one.
-#   5. Verifies the install: the doctor, the doorway, the guard.
+#   4. Verifies the install: the doctor, the doorway, the guard.
+#
+# The face (the SvelteKit app) lives in frontend/ — start it separately:
+#   cd ~/vault/frontend && npm install && npm run dev
 set -u
 
 ts=$(date +%Y%m%d-%H%M%S)
@@ -19,7 +21,7 @@ pass=0; fail=0
 ok()  { echo "  ✔ $1"; pass=$((pass+1)); }
 bad() { echo "  ✘ $1"; fail=$((fail+1)); }
 
-echo "== Week-4 starter vault installer =="
+echo "== Command Center installer =="
 
 # ---- 1 · place the vault at ~/vault -----------------------------------------
 mkdir -p ~/archive
@@ -64,16 +66,7 @@ done
 export PATH="$HOME/vault/bin:$PATH"
 echo "  ~/vault/bin added to PATH (open a new terminal to pick it up)"
 
-# ---- 4 · the todo app ----------------------------------------------------------
-if [ ! -e "$HOME/todo-app/todo.html" ]; then
-  mkdir -p "$HOME/todo-app"
-  cp setup/todo-app/todo.html "$HOME/todo-app/todo.html"
-  echo "  todo app restored -> ~/todo-app/todo.html"
-else
-  echo "  ~/todo-app/todo.html already there — kept yours"
-fi
-
-# ---- 5 · verify -----------------------------------------------------------------
+# ---- 4 · verify -----------------------------------------------------------------
 echo "== Verifying =="
 ./doctor.sh >/dev/null 2>&1              && ok "the doctor: clean bill of health"            || bad "the doctor found problems — run ./doctor.sh"
 bin/vault help >/dev/null 2>&1           && ok "the doorway answers: vault help"             || bad "bin/vault won't run"
@@ -83,12 +76,14 @@ bash -n ~/.claude/hooks/vault-write-guard.sh \
                                          && ok "the guard parses"                            || bad "the guard has a syntax error"
 python3 -c 'import json; json.load(open("'"$HOME"'/.claude/settings.json"))' 2>/dev/null \
                                          && ok "settings.json is valid (guard registered)"   || bad "settings.json is not valid JSON"
-command -v node >/dev/null 2>&1          && ok "node is installed ($(node -v)) — Day 13 ready" || bad "node is MISSING — Day 13 needs it (install Node.js LTS)"
+command -v node >/dev/null 2>&1          && ok "node is installed ($(node -v)) — the face needs it" || bad "node is MISSING — the face needs it (install Node.js LTS)"
 command -v claude >/dev/null 2>&1        && ok "claude is installed"                          || bad "claude not found on PATH"
 
 echo
 if [ "$fail" -eq 0 ]; then
-  echo "All $pass checks passed. Open a NEW terminal, then: cd ~/vault && claude"
+  echo "All $pass checks passed."
+  echo "  Drive it from the terminal:  open a NEW terminal, then  cd ~/vault && claude"
+  echo "  Open its face (the app):      cd ~/vault/frontend && npm install && npm run dev"
   exit 0
 else
   echo "$pass passed, $fail FAILED — fix the ✘ lines above (ask the facilitator)."

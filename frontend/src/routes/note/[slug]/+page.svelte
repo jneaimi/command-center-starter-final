@@ -1,4 +1,5 @@
 <script>
+  import { renderMarkdown } from '$lib/md.js';
   let { data } = $props();
   const n = data.note;
 </script>
@@ -11,4 +12,4 @@
   <span class="date">{n.created}</span>
 </div>
 
-<div class="note-body">{n.body}</div>
+<div class="note-body">{@html renderMarkdown(n.body)}</div>

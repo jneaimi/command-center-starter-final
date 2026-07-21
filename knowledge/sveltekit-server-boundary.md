@@ -16,7 +16,8 @@ imports `$lib/server` into client code. Keep that boundary and the frontend can
 later deploy to a different host without a rewrite.
 
 ## Why it matters here
-- `better-sqlite3` is server-only — it must stay behind the boundary.
+- File reads and any DB driver are server-only — they stay behind the boundary.
 - API keys load server-side (see [[env-vars-and-secrets]]).
 
-This is the same shape the Task Tracker uses — see [[../projects/task-tracker/index|Task Tracker]].
+This is the same shape your command center's face uses: the pages ask the engine
+in `src/lib/server/vault.js` through `/api`, and never read the vault themselves.

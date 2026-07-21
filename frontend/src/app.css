@@ -36,6 +36,7 @@ a { color: inherit; text-decoration: none; }
 .active .badge { background: rgba(255,255,255,.25); color: #fff; }
 
 main { padding: 30px 40px; max-width: 900px; }
+main.wide { max-width: none; }
 h1 { font-size: 22px; margin: 0 0 4px; }
 h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 26px 0 12px; }
 .sub { color: var(--muted); margin: 0 0 20px; }
@@ -58,9 +59,26 @@ h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: v
 
 .empty { border: 1px dashed var(--line); border-radius: var(--radius); padding: 28px; text-align: center; color: var(--muted); }
 
-/* the note read page */
-.note-body { white-space: pre-wrap; font-size: 15px; line-height: 1.65; }
+/* the note read page — rendered markdown */
+.note-body { font-size: 15px; line-height: 1.7; color: var(--ink); max-width: 680px; }
+.note-body p { margin: 0 0 14px; }
+.note-body h2 { font-size: 16px; margin: 24px 0 8px; }
+.note-body h3 { font-size: 14px; margin: 18px 0 6px; }
+.note-body h4 { font-size: 13px; margin: 16px 0 6px; color: var(--muted); }
+.note-body ul, .note-body ol { margin: 0 0 14px; padding-left: 22px; }
+.note-body li { margin: 4px 0; }
+.note-body code { background: var(--line); border-radius: 4px; padding: 1px 5px; font-size: 13px; font-family: ui-monospace, Menlo, monospace; }
+.note-body pre { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; overflow-x: auto; margin: 0 0 14px; }
+.note-body pre code { background: none; padding: 0; font-size: 12.5px; }
+.note-body blockquote { border-left: 3px solid var(--accent-2); margin: 0 0 14px; padding: 2px 0 2px 14px; color: var(--muted); }
+.note-body a { color: var(--accent); text-decoration: underline; }
+.note-body strong { font-weight: 650; }
 .back { color: var(--muted); font-size: 13px; }
+
+/* the decision gate on an ADR page */
+.decision-gate { display: flex; justify-content: space-between; align-items: center; gap: 14px; background: color-mix(in srgb, var(--accent-2) 12%, transparent); border: 1px solid var(--accent-2); border-radius: var(--radius); padding: 13px 16px; margin-bottom: 20px; font-size: 14px; }
+.decision-gate .actions { display: flex; gap: 8px; }
+.decision-gate form { margin: 0; }
 
 /* the Human-Gate inbox */
 .proposal { border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 18px; background: var(--card); margin-bottom: 12px; }
@@ -82,7 +100,49 @@ h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: v
 .chip.st-done { color: var(--accent); }
 code { background: var(--line); border-radius: 4px; padding: 1px 5px; font-size: 12.5px; font-family: ui-monospace, Menlo, monospace; }
 
-/* light captures strip on Home */
-.capture-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; border: 1px dashed var(--line); border-radius: 8px; padding: 9px 14px; margin-bottom: 8px; background: var(--card); font-size: 13.5px; }
-.capture-row form { margin: 0; }
 .btn.sm { padding: 5px 12px; font-size: 12px; }
+
+/* ── tabs (project page) ── */
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin: 18px 0 18px; }
+.tab { background: none; border: 0; border-bottom: 2px solid transparent; padding: 8px 14px; font-size: 13.5px; color: var(--muted); cursor: pointer; margin-bottom: -1px; }
+.tab:hover { color: var(--ink); }
+.tab.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+.tab-n { font-size: 11px; background: var(--line); color: var(--muted); border-radius: 20px; padding: 0 7px; margin-left: 2px; }
+.tab.active .tab-n { background: var(--accent); color: #fff; }
+
+/* ── plan actions ── */
+.btn.board { background: var(--accent); border-color: var(--accent); color: #fff; }
+code { background: var(--line); border-radius: 4px; padding: 1px 5px; font-size: 12px; font-family: ui-monospace, Menlo, monospace; }
+
+/* ── the plan board (kanban) ── */
+.banner { display: flex; justify-content: space-between; align-items: center; gap: 14px; background: var(--card); border: 1.5px solid var(--accent-2); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 16px; font-size: 13.5px; }
+.banner form { margin: 0; }
+
+.board { display: flex; gap: 12px; align-items: flex-start; overflow-x: auto; padding-bottom: 10px; margin-top: 8px; }
+.col { flex: 1 1 180px; min-width: 180px; background: color-mix(in srgb, var(--line) 22%, transparent); border-radius: 10px; padding: 8px; }
+.col.gate { background: color-mix(in srgb, var(--accent-2) 12%, transparent); }
+.col-head { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 700; padding: 6px 6px 10px; display: flex; align-items: center; gap: 6px; }
+.col-head .ct { background: var(--line); color: var(--muted); border-radius: 20px; padding: 0 7px; font-size: 10px; }
+.col-body { display: flex; flex-direction: column; gap: 8px; min-height: 24px; }
+.col-empty { color: var(--muted); font-size: 12px; text-align: center; padding: 14px 4px; opacity: .7; }
+
+.scope-card { border: 1.5px solid var(--accent-2); border-radius: 8px; background: var(--card); padding: 11px 12px; }
+.scope-title { font-weight: 600; font-size: 13.5px; margin-bottom: 4px; }
+.scope-ex { color: var(--muted); font-size: 11.5px; line-height: 1.4; margin-bottom: 8px; }
+.scope-ex.muted { opacity: .8; }
+.scope-tasks { margin: 0 0 10px; padding-left: 16px; color: var(--ink); font-size: 12px; line-height: 1.5; }
+.scope-card form { margin: 0; }
+.btn.full { width: 100%; }
+.scope-locked { text-align: center; font-size: 11px; color: var(--muted); border: 1px dashed var(--line); border-radius: 6px; padding: 7px; }
+
+.task-card { display: block; border: 1px solid var(--line); border-radius: 8px; background: var(--card); padding: 10px 11px; }
+.task-card.done { opacity: .72; }
+.tc-title { display: block; font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 6px; line-height: 1.35; }
+.tag { display: inline-block; font-size: 10px; color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, transparent); border-radius: 20px; padding: 1px 8px; }
+.hint { font-size: 10.5px; color: var(--muted); margin-top: 8px; line-height: 1.5; }
+.hint code { font-size: 10.5px; background: var(--bg); }
+
+.gate-actions { display: flex; gap: 6px; margin-top: 8px; }
+.gate-actions form { margin: 0; }
+.reject-form { display: flex; gap: 6px; margin-top: 8px; }
+.reason { flex: 1; min-width: 0; padding: 5px 8px; border: 1px solid var(--line); border-radius: 6px; font-size: 12px; }

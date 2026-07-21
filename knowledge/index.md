@@ -26,13 +26,10 @@ The front door. Everything worth finding is linked from here.
 
 ## References
 - [[sveltekit-server-boundary]]
+- [[static-site-hosting]] — build and publish a static page
 - [[api-rate-limiting]]
 - [[env-vars-and-secrets]]
-- [[apidirect-quickstart]] — the Day-12 data helper
-
-## Decisions
-- [[why-sqlite-for-the-tracker]]
 
 ## Projects
-- [[../projects/task-tracker/index|Task Tracker]]
-- [[../projects/the-pulse/index|The Pulse]] — the Day-12 build (starts as a stub)
+- [[../projects/hello-world/index|Hello World]] — a guided trip through the whole loop
+- [[../projects/profile-site/index|Personal Profile Website]] — a real build, ready to test
