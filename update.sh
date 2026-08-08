@@ -6,7 +6,8 @@
 #   cd ~/vault && git pull && bash update.sh
 #
 # install.sh copies two things OUT of this repo: the vault + tools into ~/vault,
-# and the ~/.claude side (rules, settings, the guard hook, the my-vault skill).
+# and the ~/.claude side (rules, settings, the guard hook). The my-vault skill
+# lives in the vault itself (.claude/skills/), so git pull already refreshed it.
 # A `git pull` refreshes the vault and bin/vault, but NOT the ~/.claude side —
 # that's what this script does. It re-stages the ~/.claude files and re-checks
 # the tools. It NEVER touches your notes, projects, or inbox, and it archives
@@ -23,14 +24,12 @@ bad() { echo "  ✘ $1"; fail=$((fail+1)); }
 
 echo "== Command Center updater =="
 
-# ---- refresh the ~/.claude side (rules · settings · guard · skill) -----------
-mkdir -p ~/.claude/hooks ~/.claude/skills
+# ---- refresh the ~/.claude side (rules · settings · guard) -------------------
+mkdir -p ~/.claude/hooks
 cp setup/dot-claude/CLAUDE.md            ~/.claude/CLAUDE.md
 cp setup/dot-claude/settings.json        ~/.claude/settings.json
 cp setup/dot-claude/hooks/vault-write-guard.sh ~/.claude/hooks/vault-write-guard.sh
-rm -rf ~/.claude/skills/my-vault
-cp -R setup/dot-claude/skills/my-vault   ~/.claude/skills/my-vault
-echo "  ~/.claude refreshed (rules, settings, the guard, the my-vault skill)"
+echo "  ~/.claude refreshed (rules, settings, the guard) — my-vault came with the pull"
 
 # ---- tools executable + PATH -------------------------------------------------
 chmod +x bin/vault doctor.sh ~/.claude/hooks/vault-write-guard.sh 2>/dev/null

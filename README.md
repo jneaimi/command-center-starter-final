@@ -17,7 +17,7 @@ bash command-center-starter-final/install.sh
 
 The installer places the vault at `~/vault` (archiving any previous one to
 `~/archive` — nothing is deleted), stages the `~/.claude` side (rules, settings,
-the guard hook, the `my-vault` skill), puts the `vault` command on your PATH, and
+the guard hook), puts the `vault` command on your PATH, and
 **verifies everything**. Then, in two places:
 
 ```bash
@@ -33,8 +33,9 @@ Windows: run the same steps inside WSL (Ubuntu).
 ## Update (without reinstalling)
 
 `install.sh` copies files *out* of this repo into `~/vault` **and** into
-`~/.claude`. A plain `git pull` refreshes the vault and the `vault` command, but
-not the `~/.claude` side (the guard + skill). To pull everything up to date
+`~/.claude`. A plain `git pull` refreshes the vault, the `vault` command, and the
+`my-vault` skill (a project skill — it lives in the vault at `.claude/skills/`),
+but not the `~/.claude` side (the guard + settings). To pull everything up to date
 without reinstalling — and without touching your notes, projects, or inbox:
 
 ```bash
@@ -43,7 +44,7 @@ cd ~/vault && git pull && bash update.sh
 
 `update.sh` re-stages the `~/.claude` files and re-checks the tools; it archives
 nothing and leaves your vault content exactly as it is. Restart your Claude Code
-session afterward so the refreshed guard + skill load.
+session afterward so the refreshed guard and skill load.
 
 ## What's inside
 

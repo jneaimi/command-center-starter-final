@@ -6,8 +6,9 @@
 #
 # What it does, in order (nothing is ever deleted — only archived):
 #   1. Places the vault at ~/vault (archives any vault already there).
-#   2. Stages the ~/.claude side: global rules, the guard + settings, my-vault
-#      skill (archives anything it replaces).
+#   2. Stages the ~/.claude side: global rules, the guard + settings (archives
+#      anything it replaces). The my-vault skill ships INSIDE the vault at
+#      .claude/skills/ — a project skill, placed with the vault in step 1.
 #   3. Makes the tools executable and puts ~/vault/bin on your PATH.
 #   4. Verifies the install: the doctor, the doorway, the guard.
 #
@@ -38,7 +39,7 @@ fi
 cd "$HOME/vault"
 
 # ---- 2 · stage the ~/.claude side --------------------------------------------
-mkdir -p ~/.claude/hooks ~/.claude/skills
+mkdir -p ~/.claude/hooks
 backup() {  # backup <path> — move an existing file/dir aside before replacing
   [ -e "$1" ] || return 0
   mkdir -p "$HOME/archive/dot-claude-backup-$ts"
@@ -50,11 +51,13 @@ backup ~/.claude/settings.json
 cp setup/dot-claude/settings.json ~/.claude/settings.json
 backup ~/.claude/hooks/vault-write-guard.sh
 cp setup/dot-claude/hooks/vault-write-guard.sh ~/.claude/hooks/vault-write-guard.sh
-backup ~/.claude/skills/my-vault
-cp -R setup/dot-claude/skills/my-vault ~/.claude/skills/my-vault
+# my-vault is a PROJECT skill — it arrived with the vault (.claude/skills/),
+# loads when you work in ~/vault, and updates with git pull. Nothing global.
+# A stray global copy would make a lookalike drawer — archive it if found:
+[ -d ~/.claude/skills/my-vault ] && mv ~/.claude/skills/my-vault "$HOME/archive/my-vault-global-$ts"
 # the Week-1 skill retires on Day 5; archive it if it's still around
 [ -d ~/.claude/skills/capture-note ] && mv ~/.claude/skills/capture-note "$HOME/archive/capture-note-week1-$ts"
-echo "  ~/.claude staged (rules, guard, settings, my-vault skill)"
+echo "  ~/.claude staged (rules, guard, settings) — my-vault rides in the vault"
 [ -d "$HOME/archive/dot-claude-backup-$ts" ] && echo "  previous ~/.claude files -> ~/archive/dot-claude-backup-$ts"
 
 # ---- 3 · tools executable + PATH ---------------------------------------------

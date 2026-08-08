@@ -33,7 +33,7 @@ meet it (run `doctor.sh` + the three-bad-parcels check on theirs if unsure).
 | The doorway (`bin/vault`) | copy `bin/vault` from a fresh clone; `chmod +x` |
 | The doctor | copy `doctor.sh`; `chmod +x` |
 | The guard or its wiring | `setup/dot-claude/hooks/` → `~/.claude/hooks/` and `setup/dot-claude/settings.json` → `~/.claude/settings.json`; restart Claude |
-| The skill | `setup/dot-claude/skills/my-vault/` → `~/.claude/skills/my-vault/` |
+| The skill | ships in the vault: `.claude/skills/my-vault/` — a PROJECT skill (Day-3/5 rule: vault tools live with the vault) |
 | Global rules | `setup/dot-claude/CLAUDE.md` → `~/.claude/CLAUDE.md` |
 | The todo app | `setup/todo-app/todo.html` → `~/todo-app/todo.html` |
 
