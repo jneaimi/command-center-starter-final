@@ -2,14 +2,24 @@
 // Content comes from your own vault files (trusted), but we escape HTML first,
 // so a stray `<` or `&` can never inject markup. Handles the handful of things
 // our notes actually use: headings, bold/italic, inline + fenced code, lists,
-// blockquotes, links, and [[wikilinks]].
+// tables, blockquotes, links, and [[wikilinks]].
 
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+// A link's TEXT is escaped like everything else, but its HREF is a scheme, and
+// `javascript:` is a scheme. Notes are your own — and the AI drafts them, so
+// "your own" is not the same as "safe". Allow the schemes a note actually uses;
+// anything else renders as plain text instead of a live link.
+const SAFE_HREF = /^(https?:\/\/|mailto:|#|\/|\.{0,2}\/)/i;
+const safeHref = (u) => (SAFE_HREF.test(u.trim()) ? u.trim() : null);
 
 function inline(s) {
   s = esc(s);
   s = s.replace(/`([^`]+)`/g, (_, c) => `<code>${c}</code>`);                                  // inline code
-  s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, t, u) => `<a href="${u}" target="_blank" rel="noopener">${t}</a>`); // links
+  s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, t, u) => {                                    // links
+    const href = safeHref(u);
+    return href ? `<a href="${href}" target="_blank" rel="noopener">${t}</a>` : t;
+  });
   s = s.replace(/\[\[([^\]]+)\]\]/g, (_, p) => p.split('|').pop().split('/').pop());            // wikilinks → words
   s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');                                     // bold
   s = s.replace(/(^|[^*])\*([^*\s][^*]*)\*/g, '$1<em>$2</em>');                                 // italic *x*
@@ -41,6 +51,22 @@ export function renderMarkdown(md) {
       const buf = [];
       while (i < lines.length && /^>\s?/.test(lines[i])) { buf.push(inline(lines[i].replace(/^>\s?/, ''))); i++; }
       out.push(`<blockquote>${buf.join('<br>')}</blockquote>`);
+      continue;
+    }
+    // tables — a header row, a |---|---| separator, then body rows. Anything
+    // that looks like a table but has no separator row is left as prose, so a
+    // stray pipe in a sentence does not become a one-cell table.
+    if (/^\s*\|.*\|\s*$/.test(line) && /^\s*\|[\s:|-]+\|\s*$/.test(lines[i + 1] || '')) {
+      flush();
+      const cells = (row) => row.trim().replace(/^\||\|$/g, '').split('|').map((c) => inline(c.trim()));
+      const head = cells(lines[i]);
+      i += 2;
+      const body = [];
+      while (i < lines.length && /^\s*\|.*\|\s*$/.test(lines[i])) { body.push(cells(lines[i])); i++; }
+      out.push(
+        `<table><thead><tr>${head.map((c) => `<th>${c}</th>`).join('')}</tr></thead>` +
+        `<tbody>${body.map((r) => `<tr>${r.map((c) => `<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table>`
+      );
       continue;
     }
     // lists — items may wrap onto indented continuation lines

@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# the doctor: check every note against the vault rules. Read only. (Day 7)
-cd ~/vault
+# the doctor: check every note against the vault rules. Read only.
+# The vault is VAULT_DIR, or the folder this script sits in.
+root="${VAULT_DIR:-$(cd "$(dirname "$0")" && pwd)}"
+cd "$root" || { echo "doctor: no vault at $root" >&2; exit 2; }
 flags=0
 for note in inbox/*.md knowledge/*.md projects/*/*.md; do
   [ -e "$note" ] || continue
-  # the field guide quotes example links; skip it
-  [ "$note" = "knowledge/week-1-field-guide.md" ] && continue
   front="$(head -n 12 "$note")"
   # rule 1: every note carries its frontmatter
   for field in title type created tags; do
@@ -19,9 +19,9 @@ for note in inbox/*.md knowledge/*.md projects/*/*.md; do
   # rule 4: every link points at a real note
   for target in $(grep -o '\[\[[^]|]*' "$note" | sed 's/\[\[//'); do
     b=$(basename "$target")
-    ls knowledge/"$b".md projects/*/"$b".md 2>/dev/null | grep -q . || { echo "DANGLING $target: $note"; flags=1; }
+    ls knowledge/"$b".md inbox/"$b".md projects/*/"$b".md 2>/dev/null | grep -q . || { echo "DANGLING $target: $note"; flags=1; }
   done
-  # rule 5 (my own rule, Day 7): every ADR carries a status line
+  # rule 5: every ADR carries a status line
   case "$(basename "$note")" in adr-*)
     echo "$front" | grep -q '^status:' || { echo "NO STATUS on adr: $note"; flags=1; }
   esac

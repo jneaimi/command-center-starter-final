@@ -5,16 +5,21 @@ description: The vault tool. Use when the user says "save this",
   "pick up / work on this task", or asks "what do I know about...". Reads run
   free. Every write goes through the vault command and stops for review.
 ---
+The contract is `AGENTS.md` at the top of the vault — read it if you have not.
+This skill is the same rules with the exact invocations filled in.
+
 Pick the verb by what the user asked. Writes go through the counter (the `vault`
 command) — the doctor checks the form; a clean form is accepted first time.
 You NEVER edit a vault file by hand, you NEVER complete work, and you NEVER
 approve or commit — the door (`vault-write-guard`) enforces all three.
 
 CAPTURE (write) · "save this / capture this..."
-1. Call: vault capture "<title>" --type <learning|reference> --zone <inbox/|knowledge/>
-2. Always give a real title and a known type. Default zone is inbox/ — use
-   knowledge/ only when the user says it belongs in the knowledge base.
-3. It records status: proposed. Show the receipt, then STOP. The human signs at the gate.
+1. Call: vault capture "<title>" --type <learning|reference>
+2. Always give a real title and a known type. Every capture lands in inbox/ —
+   there is no way to write straight into knowledge/, and asking for one is
+   refused. knowledge/ is on the far side of the gate.
+3. It records status: proposed. Show the receipt, then STOP. The human accepts it
+   at the gate (the Inbox page, or `vault accept <slug>`) and it becomes knowledge.
 
 RECORD A DECISION (write) · "record this decision", "we decided..."
 1. Call: vault adr <project> "<the decision in words>"
@@ -51,6 +56,8 @@ RECALL (read) · "what do I know about..."
 2. Answer and cite the notes you used. Read only. No writes.
 
 THE DOOR (why the rules hold)
+Three layers, and you are inside all of them. `AGENTS.md` states the rules; the
+`vault` command refuses a gate verb when an agent is calling it; and
 `~/.claude/hooks/vault-write-guard.sh` runs before every tool call and refuses:
 git commit/push and `vault accept`/`reject`/`commit` (approving is the human's
 signature), direct Write/Edit into the vault (use the verbs), deletes in the

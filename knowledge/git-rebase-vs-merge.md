@@ -19,4 +19,4 @@ Both integrate changes; they differ in the **history** they leave.
 - **Never** rebase a branch others have pulled — that rewrites shared history.
 - Merge to integrate a finished PR (the merge commit is a useful landmark).
 
-Part of the everyday workflow — see [[week-1-field-guide]] for the command set.
+Part of the everyday workflow — see [[how-this-works]] for the command set.

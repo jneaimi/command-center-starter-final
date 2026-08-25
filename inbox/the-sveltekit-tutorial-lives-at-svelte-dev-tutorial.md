@@ -6,4 +6,5 @@ tags: []
 status: proposed
 ---
 
-The SvelteKit tutorial lives at svelte.dev/tutorial
+It runs in the browser with no install, and the SvelteKit half starts after the
+Svelte half. Useful when the face in `frontend/` stops being obvious.

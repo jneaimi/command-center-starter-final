@@ -6,4 +6,5 @@ tags: []
 status: proposed
 ---
 
-Keyboard shortcuts save more time than they cost to learn
+Learning one costs about a minute and feels slower for a day. You then use it a
+few thousand times. The arithmetic is not close.
