@@ -11,13 +11,15 @@
 //    task  — the work. backlog → planned → active → review → done.
 //
 //  Who moves what:
+//    • The human ACCEPTS a captured note (inbox/ -> knowledge/) — a capture is
+//      a proposal, and nothing becomes knowledge without a signature.
 //    • The human COMMITS a plan (inbox / project) and a scope (board),
 //      and GATES review → done or → back-to-planning. On the face.
 //    • The AI CLAIMS a task (planned→active) and SUBMITS it (active→review)
 //      from the terminal. The AI can NEVER set done — the Hook blocks it,
 //      and this engine only writes `done` from the human's gate action.
 // ─────────────────────────────────────────────────────────────────────────
-import { readdirSync, readFileSync, writeFileSync, statSync, existsSync, appendFileSync } from 'node:fs';
+import { readdirSync, readFileSync, writeFileSync, statSync, existsSync, appendFileSync, unlinkSync } from 'node:fs';
 import { join, resolve, basename } from 'node:path';
 
 const VAULT_DIR = process.env.VAULT_DIR ? resolve(process.env.VAULT_DIR) : resolve(process.cwd(), '..');
@@ -205,6 +207,14 @@ export function pendingDecisions() {
   return out;
 }
 
+// The Human-Gate queue, part two: captured notes waiting to be filed. A capture
+// lands in inbox/ as `proposed` — it is not knowledge until a human accepts it.
+// (A note with no status line at all is treated as waiting, not as settled.)
+const noteWaiting = (s) => { const x = (s || '').toLowerCase(); return x === '' || x === 'proposed'; };
+export const pendingNotes = () => build().notes.filter((n) => n.zone === 'inbox' && noteWaiting(n.status));
+// Rejected captures stay in inbox/ as the record of a "no" — shown, not re-offered.
+export const rejectedNotes = () => build().notes.filter((n) => n.zone === 'inbox' && (n.status || '').toLowerCase() === 'rejected');
+
 // THE BOARD (mechanic 2, per plan): scopes and their tasks, laid out in columns.
 // Backlog holds the not-yet-committed scope groups; planning…done hold task cards.
 export function planBoard(name, planSlug) {
@@ -257,7 +267,7 @@ export function planBoard(name, planSlug) {
 export const counts = () => ({
   knowledge: build().notes.filter((n) => n.zone === 'knowledge').length,
   projects: build().projects.length,
-  inbox: pendingDecisions().length
+  inbox: pendingNotes().length + pendingDecisions().length
 });
 
 // SEARCH (mechanic 3): notes + project artifacts, by title / body.
@@ -273,8 +283,48 @@ export function search(q) {
 
 // ── the governed writes ──
 function artFile(name, slug) { return join(VAULT_DIR, 'projects', name, slug + '.md'); }
+
+// A slug arrives from a form post, and a form post is the outside world. Only a
+// kebab-case name is ever a note of ours — anything else never becomes a path.
+const SLUG = /^[a-z0-9][a-z0-9-]*$/;
+function safeSlug(slug) {
+  const s = String(slug || '');
+  if (!SLUG.test(s)) throw new Error(`“${s}” is not a note name`);
+  return s;
+}
+function noteFile(zone, slug) { return join(VAULT_DIR, zone, safeSlug(slug) + '.md'); }
+
+// Set the status line, or add one if the note never carried it.
+function stamped(raw, status) {
+  if (/^status:.*$/m.test(raw)) return raw.replace(/^status:.*$/m, `status: ${status}`);
+  return raw.replace(/^(---\n[\s\S]*?)(\n---\n)/, `$1\nstatus: ${status}$2`);
+}
 function setStatus(file, status) {
-  writeFileSync(file, readFileSync(file, 'utf-8').replace(/^status:.*$/m, `status: ${status}`));
+  writeFileSync(file, stamped(readFileSync(file, 'utf-8'), status));
+}
+
+// ACCEPT a captured note (human): inbox/ -> knowledge/, status accepted, linked
+// from the index. The same move `vault accept` makes on the terminal — one gate,
+// two doors, so the face and the CLI can never disagree about what is settled.
+export function acceptNote(slug) {
+  const src = noteFile('inbox', slug);
+  if (!existsSync(src)) throw new Error(`no proposal named “${slug}” in inbox/`);
+  const dest = noteFile('knowledge', slug);
+  if (existsSync(dest)) throw new Error(`“${slug}” is already in knowledge/`);
+  writeFileSync(dest, stamped(readFileSync(src, 'utf-8'), 'accepted'));
+  unlinkSync(src);
+  appendFileSync(join(VAULT_DIR, 'knowledge', 'index.md'), `- [[${safeSlug(slug)}]]\n`);
+  forget();
+  return { slug, status: 'accepted' };
+}
+
+// REJECT a captured note (human): it stays in inbox/ as the record of your no.
+export function rejectNote(slug) {
+  const file = noteFile('inbox', slug);
+  if (!existsSync(file)) throw new Error(`no proposal named “${slug}” in inbox/`);
+  setStatus(file, 'rejected');
+  forget();
+  return { slug, status: 'rejected' };
 }
 
 // COMMIT: greenlight a proposed ADR or plan for implementation (→ accepted).

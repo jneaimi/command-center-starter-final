@@ -51,7 +51,7 @@ session afterward so the refreshed guard and skill load.
 ```
 CLAUDE.md                     the vault rules the doctor enforces
 bin/vault                     the doorway — one command, both of you use it:
-                                draft   capture · adr · plan · scope · task
+                                draft   capture (→ inbox/) · adr · plan · scope · task
                                 move    claim (→active) · submit (→review)
                                 gate    accept · reject · commit  (human only)
                                 read    projects · recent · search · tree
@@ -62,7 +62,8 @@ projects/hello-world/         a guided tour — each ADR/plan/scope/task explain
                               whole loop once
 projects/profile-site/        a realistic build, ready to test on the board:
                               decisions + a draft plan + scopes + backlog tasks
-inbox/                        quick captures waiting to be filed
+inbox/                        captures waiting at the gate — a capture is a
+                              proposal; only you move one into knowledge/
 frontend/                     the SvelteKit face (see frontend/README.md)
 setup/dot-claude/             the ~/.claude side the installer stages:
                                 CLAUDE.md        global rules
@@ -80,6 +81,7 @@ command stop the AI from going around them.
 
 | Move | Who | Where |
 |---|---|---|
+| Accept a captured note (inbox/ → knowledge/) | human | the inbox |
 | Approve a decision (ADR → accepted) | human | inbox / the ADR's page |
 | Commit a plan (→ accepted) — only once its decision is accepted | human | the board |
 | Commit a scope → its tasks move to planning | human | the board |
@@ -89,7 +91,8 @@ command stop the AI from going around them.
 
 The AI can **never** complete work or approve anything — `vault done`,
 `vault accept`, `vault reject`, and `vault commit` are blocked at the door. It
-drafts and does; you sign.
+drafts and does; you sign. And there is only one way in: `vault capture` always
+lands in `inbox/`, so nothing reaches `knowledge/` without passing the gate.
 
 ## Keep it always on
 

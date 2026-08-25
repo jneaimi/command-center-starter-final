@@ -14,7 +14,7 @@ meta()   { grep -m1 "^$2:" "$1" | sed 's/^[^:]*: *//; s/^"//; s/"$//'; }
 
 case "$verb" in
 
-  capture)  # vault capture "a thing worth keeping" [--type learning|reference] [--zone inbox/|knowledge/]
+  capture)  # vault capture "a thing worth keeping" [--type learning|reference]  -> inbox/, proposed
     title="$1"; shift
     type="learning"; zone="inbox/"
     while [ $# -gt 0 ]; do case "$1" in
@@ -29,9 +29,15 @@ case "$verb" in
     # 2 · valid type (repair: lowercase a near-miss, never invent)
     type=$(printf '%s' "$type" | tr '[:upper:]' '[:lower:]')
     case "$type" in learning|reference) ;; *) refuse "'$type' is not a known type. Use: learning, reference." ;; esac
-    # 3 · allowed zone (repair: an empty zone defaults to inbox/)
+    # 3 · allowed zone — there is ONE way in. A capture is a proposal, and it
+    #     waits in inbox/ until a human accepts it (vault accept / the gate on
+    #     the face). Writing straight into knowledge/ would walk past the gate.
     [ -n "$zone" ] || zone="inbox/"
-    case "$zone" in inbox/|knowledge/) ;; *) refuse "'$zone' is not an allowed zone. Use: inbox/ or knowledge/." ;; esac
+    case "$zone" in
+      inbox/) ;;
+      knowledge/) refuse "knowledge/ is on the far side of the gate. Capture it (it lands in inbox/), then a human accepts it: vault accept <slug>." ;;
+      *) refuse "'$zone' is not an allowed zone. Captures land in inbox/." ;;
+    esac
     # 4 · non-sensitive content only — the rule that never moves
     case "$(printf '%s' "$title" | tr '[:upper:]' '[:lower:]')" in
       *secret*|*classified*|*password*|*confidential*)
@@ -45,9 +51,8 @@ case "$verb" in
     # --- passed the doctor -> record a well-formed proposal ---
     printf -- '---\ntitle: "%s"\ntype: %s\ncreated: %s\ntags: []\nstatus: proposed\n---\n\n%s\n' \
       "$title" "$type" "$(date +%F)" "$title" > "$file"
-    # knowledge/ notes join the front door; inbox/ waits for routing (Day 14)
-    [ "$zone" = "knowledge/" ] && echo "- [[$slug]]" >> knowledge/index.md
-    echo "captured: $file (type: $type, status: proposed)" ;;
+    # it joins the front door (knowledge/index.md) when a human accepts it
+    echo "captured: $file (type: $type, status: proposed) — waiting at the gate." ;;
 
   adr)  # vault adr <project> "the decision"
     proj="$1"; title="$2"
@@ -262,7 +267,7 @@ case "$verb" in
   help|--help|"")
     echo "vault: the doorway to your vault. One command, both of you use it."
     echo "  writes (checked at the door, read by the doctor):"
-    echo "    vault capture \"words\" [--type learning|reference] [--zone inbox/|knowledge/]"
+    echo "    vault capture \"words\" [--type learning|reference]   (lands in inbox/)"
     echo "    vault adr     <project> \"the decision\""
     echo "    vault plan    <project> \"the outcome\" [--goal \"one line\"]"
     echo "    vault scope   <project> <plan-slug> \"the slice\""

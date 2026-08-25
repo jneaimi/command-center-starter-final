@@ -11,10 +11,12 @@ You NEVER edit a vault file by hand, you NEVER complete work, and you NEVER
 approve or commit — the door (`vault-write-guard`) enforces all three.
 
 CAPTURE (write) · "save this / capture this..."
-1. Call: vault capture "<title>" --type <learning|reference> --zone <inbox/|knowledge/>
-2. Always give a real title and a known type. Default zone is inbox/ — use
-   knowledge/ only when the user says it belongs in the knowledge base.
-3. It records status: proposed. Show the receipt, then STOP. The human signs at the gate.
+1. Call: vault capture "<title>" --type <learning|reference>
+2. Always give a real title and a known type. Every capture lands in inbox/ —
+   there is no way to write straight into knowledge/, and asking for one is
+   refused. knowledge/ is on the far side of the gate.
+3. It records status: proposed. Show the receipt, then STOP. The human accepts it
+   at the gate (the Inbox page, or `vault accept <slug>`) and it becomes knowledge.
 
 RECORD A DECISION (write) · "record this decision", "we decided..."
 1. Call: vault adr <project> "<the decision in words>"

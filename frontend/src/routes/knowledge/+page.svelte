@@ -6,7 +6,7 @@
 <p class="sub">Your settled notes — everything you've accepted into the vault.</p>
 
 {#if data.notes.length === 0}
-  <div class="empty">No notes yet. Approve something from your inbox and it lands here.</div>
+  <div class="empty">No notes yet. Accept a capture at the <a href="/inbox">inbox gate</a> and it lands here.</div>
 {:else}
   <div class="cards">
     {#each data.notes as n}

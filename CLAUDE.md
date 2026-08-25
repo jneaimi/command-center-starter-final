@@ -17,5 +17,7 @@ CLAUDE.md on top of these.
 
 The write path (Week 3): notes enter through the doorway — `bin/vault` — where
 the doctor checks the form before anything lands. Writes stop as
-`status: proposed`; the human reviews the `git diff` and commits. The doctor
+`status: proposed`; the human reviews the `git diff` and commits. A capture waits
+in `inbox/` until a human accepts it — on the Inbox page, or `vault accept
+<slug>` — which moves it into `knowledge/` and links it from the index. The doctor
 (`doctor.sh`) re-checks the whole vault any time: `run the doctor`.

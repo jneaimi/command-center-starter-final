@@ -5,6 +5,20 @@
 <h1>Home</h1>
 <p class="sub">Everything in your command center, at a glance.</p>
 
+<!-- What the AI has proposed and you haven't signed. The front door shows the
+     gate, so nothing waits in a folder you never open. -->
+{#if data.waiting.total > 0}
+  <div class="decision-gate">
+    <span>
+      <strong>{data.waiting.total}</strong>
+      {data.waiting.total === 1 ? 'thing is' : 'things are'} waiting on you —
+      {data.waiting.notes} note{data.waiting.notes === 1 ? '' : 's'} to file,
+      {data.waiting.decisions} decision{data.waiting.decisions === 1 ? '' : 's'} to approve.
+    </span>
+    <span class="actions"><a class="btn approve" href="/inbox">Open the gate →</a></span>
+  </div>
+{/if}
+
 <form class="search" method="GET" action="/">
   <input name="q" placeholder="Search your vault…" value={data.q} autocomplete="off" />
   <button type="submit">Search</button>
