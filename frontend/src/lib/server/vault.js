@@ -20,7 +20,7 @@
 //      and this engine only writes `done` from the human's gate action.
 // ─────────────────────────────────────────────────────────────────────────
 import { readdirSync, readFileSync, writeFileSync, statSync, existsSync, appendFileSync, unlinkSync } from 'node:fs';
-import { join, resolve, basename } from 'node:path';
+import { join, resolve, basename, sep } from 'node:path';
 
 const VAULT_DIR = process.env.VAULT_DIR ? resolve(process.env.VAULT_DIR) : resolve(process.cwd(), '..');
 const ZONES = ['inbox', 'knowledge'];
@@ -282,17 +282,24 @@ export function search(q) {
 }
 
 // ── the governed writes ──
-function artFile(name, slug) { return join(VAULT_DIR, 'projects', name, slug + '.md'); }
-
-// A slug arrives from a form post, and a form post is the outside world. Only a
-// kebab-case name is ever a note of ours — anything else never becomes a path.
+//
+// Every name below arrives from a form post, and a form post is the outside
+// world. Two checks, in order: a name must LOOK like one of ours (kebab-case,
+// so `..` and `/` never get in), and the path it builds must LAND inside the
+// vault. Either one alone would do here; both is the habit worth having.
 const SLUG = /^[a-z0-9][a-z0-9-]*$/;
 function safeSlug(slug) {
   const s = String(slug || '');
   if (!SLUG.test(s)) throw new Error(`“${s}” is not a note name`);
   return s;
 }
-function noteFile(zone, slug) { return join(VAULT_DIR, zone, safeSlug(slug) + '.md'); }
+function inVault(...parts) {
+  const p = resolve(VAULT_DIR, ...parts);
+  if (p !== VAULT_DIR && !p.startsWith(VAULT_DIR + sep)) throw new Error('that path is outside the vault');
+  return p;
+}
+function artFile(name, slug) { return inVault('projects', safeSlug(name), safeSlug(slug) + '.md'); }
+function noteFile(zone, slug) { return inVault(zone, safeSlug(slug) + '.md'); }
 
 // Set the status line, or add one if the note never carried it.
 function stamped(raw, status) {
@@ -313,7 +320,7 @@ export function acceptNote(slug) {
   if (existsSync(dest)) throw new Error(`“${slug}” is already in knowledge/`);
   writeFileSync(dest, stamped(readFileSync(src, 'utf-8'), 'accepted'));
   unlinkSync(src);
-  appendFileSync(join(VAULT_DIR, 'knowledge', 'index.md'), `- [[${safeSlug(slug)}]]\n`);
+  appendFileSync(inVault('knowledge', 'index.md'), `- [[${safeSlug(slug)}]]\n`);
   forget();
   return { slug, status: 'accepted' };
 }

@@ -6,10 +6,20 @@
 
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
+// A link's TEXT is escaped like everything else, but its HREF is a scheme, and
+// `javascript:` is a scheme. Notes are your own — and the AI drafts them, so
+// "your own" is not the same as "safe". Allow the schemes a note actually uses;
+// anything else renders as plain text instead of a live link.
+const SAFE_HREF = /^(https?:\/\/|mailto:|#|\/|\.{0,2}\/)/i;
+const safeHref = (u) => (SAFE_HREF.test(u.trim()) ? u.trim() : null);
+
 function inline(s) {
   s = esc(s);
   s = s.replace(/`([^`]+)`/g, (_, c) => `<code>${c}</code>`);                                  // inline code
-  s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, t, u) => `<a href="${u}" target="_blank" rel="noopener">${t}</a>`); // links
+  s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, t, u) => {                                    // links
+    const href = safeHref(u);
+    return href ? `<a href="${href}" target="_blank" rel="noopener">${t}</a>` : t;
+  });
   s = s.replace(/\[\[([^\]]+)\]\]/g, (_, p) => p.split('|').pop().split('/').pop());            // wikilinks → words
   s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');                                     // bold
   s = s.replace(/(^|[^*])\*([^*\s][^*]*)\*/g, '$1<em>$2</em>');                                 // italic *x*
