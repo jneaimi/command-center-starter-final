@@ -23,7 +23,7 @@ point it at a vault somewhere else:
 VAULT_DIR=~/vault npm run dev
 ```
 
-## What's inside (the four mechanics of Day 15)
+## What's inside
 
 | File | What it does |
 |---|---|
@@ -64,8 +64,8 @@ That's the three-channel loop: the terminal does the work, the face gates it.
 Because the board refreshes live, a card the AI moves from the terminal appears
 in its new column on its own — no reload.
 
-## Make it yours (homework / stretch)
+## Make it yours
 
-- Change the four tokens in `src/app.css` to your Day-14 palette.
+- Change the four tokens at the top of `src/app.css` to your own palette.
 - Add drag-and-drop, filters, or a graph of your links.
 - Deploy it (the Node adapter builds with `npm run build` → `npm run preview`).

@@ -15,7 +15,7 @@ CLAUDE.md on top of these.
    slices a plan (`parent`), a `work-item` attaches to a scope or a plan.
    An `adr` records a decision, off to the side of that spine.
 
-The write path (Week 3): notes enter through the doorway — `bin/vault` — where
+The write path: notes enter through the doorway — `bin/vault` — where
 the doctor checks the form before anything lands. Writes stop as
 `status: proposed`; the human reviews the `git diff` and commits. A capture waits
 in `inbox/` until a human accepts it — on the Inbox page, or `vault accept

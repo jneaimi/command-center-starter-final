@@ -28,8 +28,8 @@ echo "== Command Center installer =="
 mkdir -p ~/archive
 if [ "$here" != "$HOME/vault" ]; then
   if [ -e "$HOME/vault" ]; then
-    mv "$HOME/vault" "$HOME/archive/vault-pre-week4-$ts"
-    echo "  archived your previous vault -> ~/archive/vault-pre-week4-$ts"
+    mv "$HOME/vault" "$HOME/archive/vault-backup-$ts"
+    echo "  archived your previous vault -> ~/archive/vault-backup-$ts"
   fi
   cp -R "$here" "$HOME/vault"
   echo "  vault placed at ~/vault"
@@ -55,8 +55,6 @@ cp setup/dot-claude/hooks/vault-write-guard.sh ~/.claude/hooks/vault-write-guard
 # loads when you work in ~/vault, and updates with git pull. Nothing global.
 # A stray global copy would make a lookalike drawer — archive it if found:
 [ -d ~/.claude/skills/my-vault ] && mv ~/.claude/skills/my-vault "$HOME/archive/my-vault-global-$ts"
-# the Week-1 skill retires on Day 5; archive it if it's still around
-[ -d ~/.claude/skills/capture-note ] && mv ~/.claude/skills/capture-note "$HOME/archive/capture-note-week1-$ts"
 echo "  ~/.claude staged (rules, guard, settings) — my-vault rides in the vault"
 [ -d "$HOME/archive/dot-claude-backup-$ts" ] && echo "  previous ~/.claude files -> ~/archive/dot-claude-backup-$ts"
 
@@ -89,6 +87,6 @@ if [ "$fail" -eq 0 ]; then
   echo "  Open its face (the app):      cd ~/vault/frontend && npm install && npm run dev"
   exit 0
 else
-  echo "$pass passed, $fail FAILED — fix the ✘ lines above (ask the facilitator)."
+  echo "$pass passed, $fail FAILED — fix the ✘ lines above."
   exit 2
 fi

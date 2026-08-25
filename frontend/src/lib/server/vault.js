@@ -3,7 +3,7 @@
 //  vault files. Pages import it in their +page.server.js; they never read the disk
 //  themselves, and nothing client-side can reach it.
 //
-//  Day-15 mechanics:  1·LOAD  2·LIST (in-memory index)  3·SEARCH  4·CHANGES
+//  Four mechanics:  1·LOAD  2·LIST (in-memory index)  3·SEARCH  4·CHANGES
 //
 //  The work model (one status field = the lifecycle state):
 //    ADR   — a decision. proposed → accepted → shipped (or rejected).

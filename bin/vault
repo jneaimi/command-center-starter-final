@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# vault: the doorway. Writes come in here, checked at the door (Day 9),
-# and the doctor reads every form before it is filed (Day 11).
+# vault: the doorway. Every write comes in here and is checked at the door,
+# so a malformed note is refused before it lands rather than found later.
 # Project work follows the plan model: a PLAN states an outcome, a SCOPE
 # slices a plan, a TASK attaches to a scope or a plan. An ADR records a
 # decision, off to the side of that spine.

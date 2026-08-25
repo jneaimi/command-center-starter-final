@@ -10,7 +10,7 @@ tags: [index, hub]
 The front door. Everything worth finding is linked from here.
 
 ## Start here
-- [[week-1-field-guide]] — the Week 1 reference (concepts, glossary, the two homes)
+- [[how-this-works]] — the whole system on one page: the pieces, the words, the loop
 
 ## Learnings
 - [[react-state-and-effects]]

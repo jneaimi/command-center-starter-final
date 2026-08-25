@@ -34,7 +34,7 @@ git clone https://github.com/jneaimi/command-center-starter-final.git
 bash command-center-starter-final/install.sh
 ```
 
-The installer archives any existing `~/vault` to `~/archive/vault-pre-week4-<timestamp>`,
+The installer archives any existing `~/vault` to `~/archive/vault-backup-<timestamp>`,
 copies this repo to `~/vault`, stages three files into `~/.claude`, adds `~/vault/bin` to your
 PATH via `~/.zshrc` / `~/.bashrc`, and runs 7 checks. Nothing is ever deleted — only archived.
 
@@ -100,7 +100,6 @@ templates/                    frontmatter stubs: decision · learning · project
 frontend/                     the SvelteKit face (see frontend/README.md)
 .claude/skills/my-vault/      the skill, wired to the doorway — rides in the vault
 setup/dot-claude/             the ~/.claude side the installer stages
-docs/FACILITATOR.md           notes for running this as a taught program
 ```
 
 ## How the work moves — and who moves it
