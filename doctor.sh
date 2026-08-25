@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # the doctor: check every note against the vault rules. Read only. (Day 7)
-cd ~/vault
+cd "${VAULT_DIR:-$HOME/vault}" || { echo "doctor: no vault at ${VAULT_DIR:-$HOME/vault}" >&2; exit 2; }
 flags=0
 for note in inbox/*.md knowledge/*.md projects/*/*.md; do
   [ -e "$note" ] || continue
@@ -19,7 +19,7 @@ for note in inbox/*.md knowledge/*.md projects/*/*.md; do
   # rule 4: every link points at a real note
   for target in $(grep -o '\[\[[^]|]*' "$note" | sed 's/\[\[//'); do
     b=$(basename "$target")
-    ls knowledge/"$b".md projects/*/"$b".md 2>/dev/null | grep -q . || { echo "DANGLING $target: $note"; flags=1; }
+    ls knowledge/"$b".md inbox/"$b".md projects/*/"$b".md 2>/dev/null | grep -q . || { echo "DANGLING $target: $note"; flags=1; }
   done
   # rule 5 (my own rule, Day 7): every ADR carries a status line
   case "$(basename "$note")" in adr-*)

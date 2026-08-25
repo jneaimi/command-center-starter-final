@@ -10,9 +10,14 @@
 # lives in the vault itself (.claude/skills/), so git pull already refreshed it.
 # A `git pull` refreshes the vault and bin/vault, but NOT the ~/.claude side —
 # that's what this script does. It re-stages the ~/.claude files and re-checks
-# the tools. It NEVER touches your notes, projects, or inbox, and it archives
-# nothing — your vault content is left exactly as it is.
+# the tools.
+#
+# Your VAULT CONTENT is never touched — notes, projects, and inbox are left
+# exactly as they are. The ~/.claude files ARE replaced, so anything you wrote
+# there is moved to ~/archive first. Nothing is deleted.
 set -u
+
+ts=$(date +%Y%m%d-%H%M%S)
 
 here="$(cd "$(dirname "$0")" && pwd)"
 cd "$here"
@@ -25,11 +30,22 @@ bad() { echo "  ✘ $1"; fail=$((fail+1)); }
 echo "== Command Center updater =="
 
 # ---- refresh the ~/.claude side (rules · settings · guard) -------------------
+# These files are REPLACED, so move what's there aside first. If you had your
+# own global rules or your own settings.json, they are in ~/archive, not gone.
 mkdir -p ~/.claude/hooks
+backup() {  # backup <path> — move an existing file aside before replacing it
+  [ -e "$1" ] || return 0
+  mkdir -p "$HOME/archive/dot-claude-backup-$ts"
+  cp -R "$1" "$HOME/archive/dot-claude-backup-$ts/"
+}
+backup ~/.claude/CLAUDE.md
+backup ~/.claude/settings.json
+backup ~/.claude/hooks/vault-write-guard.sh
 cp setup/dot-claude/CLAUDE.md            ~/.claude/CLAUDE.md
 cp setup/dot-claude/settings.json        ~/.claude/settings.json
 cp setup/dot-claude/hooks/vault-write-guard.sh ~/.claude/hooks/vault-write-guard.sh
 echo "  ~/.claude refreshed (rules, settings, the guard) — my-vault came with the pull"
+[ -d "$HOME/archive/dot-claude-backup-$ts" ] && echo "  your previous ~/.claude files -> ~/archive/dot-claude-backup-$ts"
 
 # ---- tools executable + PATH -------------------------------------------------
 chmod +x bin/vault doctor.sh ~/.claude/hooks/vault-write-guard.sh 2>/dev/null

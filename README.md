@@ -42,9 +42,11 @@ without reinstalling — and without touching your notes, projects, or inbox:
 cd ~/vault && git pull && bash update.sh
 ```
 
-`update.sh` re-stages the `~/.claude` files and re-checks the tools; it archives
-nothing and leaves your vault content exactly as it is. Restart your Claude Code
-session afterward so the refreshed guard and skill load.
+`update.sh` re-stages the `~/.claude` files and re-checks the tools. Your vault
+content — notes, projects, inbox — is left exactly as it is. The `~/.claude`
+files *are* replaced, so your previous ones are moved to `~/archive` first;
+nothing is deleted. Restart your Claude Code session afterward so the refreshed
+guard and skill load.
 
 ## What's inside
 
@@ -65,11 +67,12 @@ projects/profile-site/        a realistic build, ready to test on the board:
 inbox/                        captures waiting at the gate — a capture is a
                               proposal; only you move one into knowledge/
 frontend/                     the SvelteKit face (see frontend/README.md)
+.claude/skills/my-vault/      the skill, wired to the doorway — a project
+                              skill, so it rides in the vault and updates on pull
 setup/dot-claude/             the ~/.claude side the installer stages:
                                 CLAUDE.md        global rules
                                 settings.json    the guard on Bash|Write|Edit
                                 hooks/           vault-write-guard.sh — its 4 laws
-                                skills/my-vault  the skill, wired to the doorway
 ```
 
 ## How the work moves — and who moves it
@@ -101,9 +104,14 @@ server under **PM2** — see the bonus lesson. In short:
 
 ```bash
 cd ~/vault/frontend && npm run build
-VAULT_DIR=$HOME/vault PORT=5180 pm2 start build/index.js --name command-center
+VAULT_DIR=$HOME/vault HOST=127.0.0.1 PORT=5180 pm2 start build/index.js --name command-center
 pm2 save && pm2 startup   # run the line it prints
 ```
+
+`HOST=127.0.0.1` matters. The face has no login, and every gate lives on it —
+approve, reject, commit, complete. Left on the default the server answers on
+every address the machine has, so anyone on your café or office Wi-Fi could
+sign in your name. Bound to `127.0.0.1` it answers only this computer.
 
 ## The rule that never moves
 
