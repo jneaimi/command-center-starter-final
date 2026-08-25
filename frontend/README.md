@@ -32,11 +32,13 @@ VAULT_DIR=~/vault npm run dev
 | `src/routes/note/[slug]/+page.*` | read one note |
 | `src/routes/projects/[name]/+page.*` | a project — its plans (commit + open board), decisions, history |
 | `src/routes/projects/[name]/plan/[plan]/+page.*` | the **board** — backlog → planning → active → review → completed |
-| `src/routes/inbox/+page.*` | the **Human Gate** — approve decisions, greenlight plans |
+| `src/routes/inbox/+page.*` | the **Human Gate** — file captured notes, approve decisions, greenlight plans |
 | `src/app.css` (`:root`) | your **design tokens** — change 4 lines to re-brand the whole face |
 
-The pages never touch the disk themselves — they ask `vault.js` through the
-`/api` seam. That one boundary is what keeps the face and the engine apart.
+The pages never touch the disk themselves. Each `+page.server.js` imports
+`$lib/server/vault.js`; because it sits under `src/lib/server/`, SvelteKit
+refuses to bundle it into anything client-side. That one boundary is what keeps
+the face and the engine apart.
 
 ## The board — who moves what
 
@@ -45,6 +47,8 @@ by changing that status. **Who is allowed to make each move is the whole point:*
 
 | Move | Who | Where |
 |---|---|---|
+| **Accept** a captured note (`inbox/` → `knowledge/`) | human | inbox |
+| **Approve** a decision (ADR proposed → accepted) | human | inbox / the ADR's page |
 | Commit a **plan** (proposed → accepted) | human | inbox / project / board |
 | Commit a **scope** (its tasks → planning) | human | board |
 | **Claim** a task (planning → active) | AI | terminal — `vault claim <project> <task>` |
@@ -52,8 +56,9 @@ by changing that status. **Who is allowed to make each move is the whole point:*
 | **Approve** (review → completed) | human | board — the gate |
 | **Send back** (review → planning + reason) | human | board — the gate |
 
-The AI can **never** move a card to *completed* — `vault done` is blocked at the
-door (the Hook). Only the human's **Approve** on the board writes `completed`.
+The AI can **never** move a card to *Completed* — `vault done` is blocked at the
+door (the Hook). Only the human's **Approve** on the board writes it, and what it
+writes into the file is `status: done`; *Completed* is the column's name.
 That's the three-channel loop: the terminal does the work, the face gates it.
 
 Because the board refreshes live, a card the AI moves from the terminal appears

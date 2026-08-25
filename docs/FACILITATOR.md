@@ -11,8 +11,8 @@ not mix them: v1 has no CLI, no live guard, no doctor; v2 assumes all three.
 One command per student, AI not required for the install:
 
 ```bash
-git clone https://github.com/jneaimi/command-center-starter-week4.git
-bash command-center-starter-week4/install.sh
+git clone https://github.com/jneaimi/command-center-starter-final.git
+bash command-center-starter-final/install.sh
 ```
 
 The installer is deliberately verbose and archive-only (nothing deleted;
