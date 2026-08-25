@@ -6,4 +6,5 @@ tags: []
 status: proposed
 ---
 
-The browser devtools console shows what localStorage holds
+Open devtools, go to Application, and localStorage is listed per site. Or type
+`localStorage` in the console to print the whole object at once.

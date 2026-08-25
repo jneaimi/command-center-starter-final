@@ -2,7 +2,7 @@
 // Content comes from your own vault files (trusted), but we escape HTML first,
 // so a stray `<` or `&` can never inject markup. Handles the handful of things
 // our notes actually use: headings, bold/italic, inline + fenced code, lists,
-// blockquotes, links, and [[wikilinks]].
+// tables, blockquotes, links, and [[wikilinks]].
 
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
@@ -51,6 +51,22 @@ export function renderMarkdown(md) {
       const buf = [];
       while (i < lines.length && /^>\s?/.test(lines[i])) { buf.push(inline(lines[i].replace(/^>\s?/, ''))); i++; }
       out.push(`<blockquote>${buf.join('<br>')}</blockquote>`);
+      continue;
+    }
+    // tables — a header row, a |---|---| separator, then body rows. Anything
+    // that looks like a table but has no separator row is left as prose, so a
+    // stray pipe in a sentence does not become a one-cell table.
+    if (/^\s*\|.*\|\s*$/.test(line) && /^\s*\|[\s:|-]+\|\s*$/.test(lines[i + 1] || '')) {
+      flush();
+      const cells = (row) => row.trim().replace(/^\||\|$/g, '').split('|').map((c) => inline(c.trim()));
+      const head = cells(lines[i]);
+      i += 2;
+      const body = [];
+      while (i < lines.length && /^\s*\|.*\|\s*$/.test(lines[i])) { body.push(cells(lines[i])); i++; }
+      out.push(
+        `<table><thead><tr>${head.map((c) => `<th>${c}</th>`).join('')}</tr></thead>` +
+        `<tbody>${body.map((r) => `<tr>${r.map((c) => `<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table>`
+      );
       continue;
     }
     // lists — items may wrap onto indented continuation lines

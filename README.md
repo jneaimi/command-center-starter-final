@@ -1,3 +1,15 @@
+<p align="center">
+  <img src="docs/images/banner.png" alt="Your Command Center — an agent drafts and does the work, you sign" width="100%">
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/license-MIT-3b4a2f?style=flat-square" alt="MIT licence">
+  <img src="https://img.shields.io/badge/node-%E2%89%A5%2018.13-3b4a2f?style=flat-square" alt="Node 18.13 or newer">
+  <img src="https://img.shields.io/badge/agents-AGENTS.md-c1853d?style=flat-square" alt="Follows the AGENTS.md convention">
+  <img src="https://img.shields.io/badge/built%20with-SvelteKit-c1853d?style=flat-square" alt="Built with SvelteKit">
+  <img src="https://img.shields.io/badge/data-plain%20markdown-6b6b63?style=flat-square" alt="Plain markdown files">
+</p>
+
 # Your Command Center
 
 A markdown vault you own — your knowledge and your projects — with a small web
@@ -10,6 +22,10 @@ Codex, Cursor, Gemini CLI, Aider and Claude Code all read.
 
 The repo root **is** the vault. The installer copies it to `~/vault`; the face
 lives in `frontend/`.
+
+**[Install](#install)** · **[What it looks like](#what-it-looks-like)** ·
+**[Who is allowed to do what](#who-is-allowed-to-do-what)** ·
+**[What's inside](#whats-inside)** · **[Configuration](#configuration)**
 
 ## Install
 
@@ -43,6 +59,36 @@ cd ~/vault/frontend && npm install && npm run dev   # http://localhost:5180
 
 Windows: run the same steps inside WSL (Ubuntu). New here? Start at
 `knowledge/how-this-works.md` — the whole model on one page.
+
+## What it looks like
+
+Four screens, all of it reading the markdown files next to it.
+
+### The inbox — where a draft becomes yours
+
+Notes the agent captured, decisions it proposed, plans waiting to be greenlit.
+Nothing below has happened yet; each card is a proposal with your name on the
+button.
+
+![The inbox — notes to file, decisions to approve](docs/images/inbox.png)
+
+### The board — who is allowed to move each card
+
+Backlog to Completed, one column per status. The agent claims and submits from
+the terminal; the two buttons in **Review** are yours and only yours, and the
+card tells you the exact command it used to get there.
+
+![The plan board — backlog, planning, active, review, completed](docs/images/board.png)
+
+### Home — what is waiting on you
+
+The gate is on the front door, so nothing sits unread in a folder you never open.
+
+![Home — recent notes, search, and the waiting strip](docs/images/home.png)
+
+### A note — plain markdown, rendered
+
+![A note rendered in the face](docs/images/note.png)
 
 ### Requirements
 
