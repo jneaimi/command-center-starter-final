@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # the doctor: check every note against the vault rules. Read only.
-cd "${VAULT_DIR:-$HOME/vault}" || { echo "doctor: no vault at ${VAULT_DIR:-$HOME/vault}" >&2; exit 2; }
+# The vault is VAULT_DIR, or the folder this script sits in.
+root="${VAULT_DIR:-$(cd "$(dirname "$0")" && pwd)}"
+cd "$root" || { echo "doctor: no vault at $root" >&2; exit 2; }
 flags=0
 for note in inbox/*.md knowledge/*.md projects/*/*.md; do
   [ -e "$note" ] || continue

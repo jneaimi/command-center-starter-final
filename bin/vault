@@ -5,10 +5,30 @@
 # slices a plan, a TASK attaches to a scope or a plan. An ADR records a
 # decision, off to the side of that spine.
 # Reads (recent, search, tree) run free — looking was never the risk.
-cd "${VAULT_DIR:-$HOME/vault}" || { echo "vault: no vault at ${VAULT_DIR:-$HOME/vault}" >&2; exit 2; }
+# Which vault? VAULT_DIR if you set it, otherwise the one this script lives in —
+# so an install somewhere other than ~/vault still works from any directory.
+self="$0"; while [ -L "$self" ]; do self="$(readlink "$self")"; done
+root="${VAULT_DIR:-$(cd "$(dirname "$self")/.." && pwd)}"
+cd "$root" || { echo "vault: no vault at $root" >&2; exit 2; }
 verb="$1"; shift
 
 refuse() { echo "vault: $1" >&2; exit 2; }
+
+# --- the gates defend themselves ---------------------------------------------
+# accept / reject / commit are the human's signature. Any CLI agent can run this
+# script, so the doorway does not take its word for who is calling — it looks.
+# A person runs this from a terminal, so stdin is a tty. An agent shells out
+# non-interactively, so it is not. A few agents also announce themselves.
+# This is a speed bump, not a wall: an agent that sets VAULT_I_AM_HUMAN is lying
+# on purpose. Under Claude Code a PreToolUse hook makes it a wall as well.
+agent_marker() { [ -n "${CLAUDECODE:-}${CLAUDE_CODE_ENTRYPOINT:-}${CODEX_SANDBOX:-}${REPLIT_AGENT:-}" ]; }
+human_only() {  # human_only <verb>
+  [ "${VAULT_I_AM_HUMAN:-}" = "1" ] && return 0
+  if agent_marker; then
+    refuse "'$1' is the human's signature, and this shell belongs to an agent. Draft it, show it, and stop — a human runs '$1' themselves, or clicks it on the board."
+  fi
+  [ -t 0 ] || refuse "'$1' needs a human at a terminal, and this one is not interactive. If you are a person in a script, see the README section 'The gates'."
+}
 slugof() { echo "$1" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9][^a-z0-9]*/-/g; s/^-//; s/-*$//'; }
 meta()   { grep -m1 "^$2:" "$1" | sed 's/^[^:]*: *//; s/^"//; s/"$//'; }
 
@@ -236,6 +256,7 @@ case "$verb" in
     [ "$found" -eq 1 ] || refuse "no plan found. Start one: vault plan $proj \"the outcome\"" ;;
 
   accept)  # vault accept <slug> — the Human Gate: route a proposal into knowledge/
+    human_only accept
     slug="$1"
     [ -n "$slug" ] || refuse "accept needs a proposal slug. See: vault recent"
     src="inbox/${slug}.md"
@@ -248,6 +269,7 @@ case "$verb" in
     echo "accepted: $dest (routed from inbox/, status: accepted, linked from the index)" ;;
 
   reject)  # vault reject <slug> — the Human Gate: log a "no"
+    human_only reject
     slug="$1"
     [ -n "$slug" ] || refuse "reject needs a proposal slug. See: vault recent"
     src="inbox/${slug}.md"
@@ -256,6 +278,7 @@ case "$verb" in
     echo "rejected: $src (status: rejected — kept as a record of your decision)" ;;
 
   commit)  # vault commit <project> <slug> — the Human Gate: greenlight an ADR or plan
+    human_only commit
     proj="$1"; slug="$2"
     [ -n "$proj" ] && [ -n "$slug" ] || refuse "commit needs: vault commit <project> <slug>"
     file="projects/${proj}/${slug}.md"
